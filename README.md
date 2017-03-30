@@ -34,3 +34,5 @@ Now go to the folder where MoarVM was compiled (the coverage version). Now you c
 # make sure you are in the MoarVM repo directory then run
 ln -s ../Moar-cover/report.sh
 ```
+
+Now run `./report.sh ../nqp/coverage/nqptestcov.profdata` to get the report, or run `./report.sh ../nqp/coverage/nqptestcov.profdata -html` to get it outputted as html (must have ansi2html program installed).
