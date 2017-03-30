@@ -1,0 +1,8 @@
+#!/bin/sh
+COVERAGE_DIR="./coverage"
+MOAR_BINARY="/home/samantha/perl6/bin/moar"
+if [ ! -d "$COVERAGE_DIR" ]; then
+    mkdir -p "$COVERAGE_DIR"
+fi
+RAW_FILE="./coverage/$RANDOM$RANDOM.profraw"
+LLVM_PROFILE_FILE="$RAW_FILE" exec "$MOAR_BINARY" nqp.moarvm "$@"
