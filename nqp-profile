@@ -1,8 +1,26 @@
 #!/bin/sh
+# Acts just like the normal nqp-m executable script except sets things up for
+# Saving a profile with either a random name if nqp is invocated on a file
+# or a randomly named file if it not passed a first command line argument for
+# nqp to execute.
+# Uses the MOAR_PREFIX env var to locate MoarVM, otherwise uses MoarVM from the path
 COVERAGE_DIR="./coverage"
-MOAR_BINARY="/home/samantha/perl6/bin/moar"
+if [ "$MOAR_PREFIX" = "" ]; then
+    MOAR_BINARY=$(command -v moar)
+    printf "MOAR_PREFIX env var not set, using moar binary in the path: %s\n" "$MOAR_BINARY"
+fi
+if [ ! -e "$MOAR_BINARY" ]; then
+    printf "Could not find MoarVM at (moar binary '%s')\n" "$MOAR_BINARY"
+    printf "Did you make sure to set the MOAR_PREFIX Environment variable?\n"
+    printf "MOAR_PREFIX currently set to '%s'\n" "$MOAR_PREFIX"
+    exit 1
+fi
 if [ ! -d "$COVERAGE_DIR" ]; then
     mkdir -p "$COVERAGE_DIR"
 fi
-RAW_FILE="./coverage/$RANDOM$RANDOM.profraw"
+if [ "$1" ]; then
+    RAW_FILE="${COVERAGE_DIR}/$1.profraw"
+else
+    RAW_FILE="./coverage/$RANDOM$RANDOM.profraw"
+fi
 LLVM_PROFILE_FILE="$RAW_FILE" exec "$MOAR_BINARY" nqp.moarvm "$@"
