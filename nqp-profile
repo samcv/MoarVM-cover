@@ -6,8 +6,11 @@
 # Uses the MOAR_PREFIX env var to locate MoarVM, otherwise uses MoarVM from the path
 COVERAGE_DIR="./coverage"
 if [ "$MOAR_PREFIX" = "" ]; then
+    exit;
     MOAR_BINARY=$(command -v moar)
     printf "MOAR_PREFIX env var not set, using moar binary in the path: %s\n" "$MOAR_BINARY"
+else
+    MOAR_BINARY="$MOAR_PREFIX/bin/moar"
 fi
 if [ ! -e "$MOAR_BINARY" ]; then
     printf "Could not find MoarVM at (moar binary '%s')\n" "$MOAR_BINARY"

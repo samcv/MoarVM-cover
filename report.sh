@@ -18,6 +18,7 @@ if [ "$2" == "-html" ]; then
   printf "Something went wrong. Do you have ansi2html installed?"
   exit 1
 fi
+echo llvm-cov report -instr-profile "$1" ./libmoar.so
 llvm-cov report -instr-profile "$1" ./libmoar.so && exit 0
 printf "Reached the end but nothing happened. Please read project README.md\n"
 #faketty llvm-cov report -instr-profile ../nqp/coverage/OUTPUT ./libmoar.so | ansi2html > "$RANDOM.html"
