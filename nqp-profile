@@ -1,29 +1,44 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Acts just like the normal nqp-m executable script except sets things up for
 # Saving a profile with either a random name if nqp is invocated on a file
 # or a randomly named file if it not passed a first command line argument for
 # nqp to execute.
 # Uses the MOAR_PREFIX env var to locate MoarVM, otherwise uses MoarVM from the path
-COVERAGE_DIR="./coverage"
+COVERAGE_DIR="./coverage" 1>&2
+UTILITY_NAME="$(basename $0 | sed 's/-.*//')" 1>&2
 if [ "$MOAR_PREFIX" = "" ]; then
-    exit;
     MOAR_BINARY=$(command -v moar)
-    printf "MOAR_PREFIX env var not set, using moar binary in the path: %s\n" "$MOAR_BINARY"
+    MOAR_PREFIX="$(dirname "$(dirname "$(command -v moar)")" )"
+    printf "MOAR_PREFIX env var not set, using moar binary in the path: %s\n" "$MOAR_BINARY" 1>&2
 else
     MOAR_BINARY="$MOAR_PREFIX/bin/moar"
 fi
 if [ ! -e "$MOAR_BINARY" ]; then
-    printf "Could not find MoarVM at (moar binary '%s')\n" "$MOAR_BINARY"
-    printf "Did you make sure to set the MOAR_PREFIX Environment variable?\n"
-    printf "MOAR_PREFIX currently set to '%s'\n" "$MOAR_PREFIX"
+    printf "Could not find MoarVM at (moar binary '%s')\n" "$MOAR_BINARY" 1>&2
+    printf "Did you make sure to set the MOAR_PREFIX Environment variable?\n" 1>&2
+    printf "MOAR_PREFIX currently set to '%s'\n" "$MOAR_PREFIX" 1>&2
     exit 1
 fi
 if [ ! -d "$COVERAGE_DIR" ]; then
-    mkdir -p "$COVERAGE_DIR"
+    mkdir -p "$COVERAGE_DIR" 1>&2
 fi
 if [ "$1" ]; then
-    RAW_FILE="${COVERAGE_DIR}/$1.profraw"
+    if [ "$1" = '-e' ]; then
+        RAW_FILE="./coverage/e/$RANDOM$RANDOM.profraw"
+    elif [ "$1" = '-I' ]; then
+        RAW_FILE="${COVERAGE_DIR}/I/$3.profraw"
+    else
+        RAW_FILE="${COVERAGE_DIR}/$1.profraw"
+    fi
 else
     RAW_FILE="./coverage/$RANDOM$RANDOM.profraw"
 fi
-LLVM_PROFILE_FILE="$RAW_FILE" exec "$MOAR_BINARY" nqp.moarvm "$@"
+if [ $UTILITY_NAME = "nqp" ]; then
+    LLVM_PROFILE_FILE="$RAW_FILE" exec "$MOAR_BINARY" nqp.moarvm "$@"
+elif [ $UTILITY_NAME = "perl6" ]; then
+    LLVM_PROFILE_FILE="$RAW_FILE" exec "$MOAR_PREFIX/bin/moar"  \
+    --execname="$0" --libpath="$NQP_PREFIX/share/nqp/lib" \
+    --libpath="$NQP_PREFIX/share/nqp/lib" \
+    --libpath="." ./perl6.moarvm --nqp-lib=blib "$@" \
+    2> >(grep -v 'LLVM Profile Note' 1>&2)
+fi
