@@ -1,0 +1,15 @@
+iframe {
+  resize: both;
+  overflow: scroll;
+  /*width: 49%; */
+  height: 95%;
+}
+right-frame {
+    style: float:right;
+    align: right;
+    width: 15%;
+}
+left-frame {
+    style: float:left;
+    align: left;
+}
