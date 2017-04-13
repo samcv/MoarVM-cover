@@ -88,10 +88,10 @@ case "$1" in
     JUST1) stage_1; exit;;
     JUST2) stage_2; exit;;
     JUST3) stage_3; exit ;;
-    "") ;&
-    1) stage_1;&
-    2) stage_2;&
-    3) stage_3;&
+    "") stage_1; stage_2; stage_3;;
+    1) stage_1; stage_2; stage_3;;
+    2) stage_2; stage_3;;
+    3) stage_3;;
     *) printf "Unknown option '$1' only know 1 2 and 3 for starting from 1st stage(default), 2nd stage or 3rd stage\n"; exit 1;;
 esac
 
