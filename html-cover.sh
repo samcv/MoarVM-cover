@@ -3,6 +3,8 @@
 faketty () { script -qfc "$(printf "%q " "$@")"; }
 # Generates ISO date format
 isodate () { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+find_latest_version () { ls /usr/bin | grep -Ee "^$1(\-[0-9.]+)?$" | sort -r | head -n 1; }
+
 HTML="html-cov"
 check_prefix () {
     if [ ! -f src/moar.c ]; then echo "You don't seem to be in the MoarVM folder. Can't see ./src/moar.c"; exit 1; fi
@@ -61,14 +63,19 @@ stage_3 () {
     # Filelist that is used for the coverage
     # main.c is in the `moar` binary. unicode.c is tens of thousands of lines long and
     # because of this is not included right now
-    filelist_libmoar () { llvm-cov report -instr-profile $PROFDATA ./libmoar.* | tail -n +3 | head -n -3 | cut -d ' ' -f 1 | grep -v 3rdparty; }
+    llvm_cov=$(find_latest_version llvm-cov)
+    if [ ! "$llvm_cov" ]; then
+        echo "Didn't find llvm-cov in /usr/bin hoping it's in your path";
+        llvm_cov=llvm-cov;
+    fi
+    filelist_libmoar () { $llvm_cov report -instr-profile $PROFDATA ./libmoar.* | tail -n +3 | head -n -3 | cut -d ' ' -f 1 | grep -v 3rdparty; }
     # We will generate the output of all the moar binary files just in case they change from main.c
     # or if under other distros there's extra files included
-    filelist_moar_bin () { llvm-cov report -instr-profile $PROFDATA ./moar | tail -n +3 | head -n -3 | cut -d ' ' -f 1 | grep -v 3rdparty; }
+    filelist_moar_bin () { $llvm_cov report -instr-profile $PROFDATA ./moar | tail -n +3 | head -n -3 | cut -d ' ' -f 1 | grep -v 3rdparty; }
     if [ ! -f "$PROFDATA" ]; then printf "Could not find $PROFDATA\n"; exit 1; fi
     if [ -e "$HTML" ]; then mv -v $HTML "$HTML-$RANDOM"; fi
-    llvm-cov show -format=html -instr-profile $PROFDATA ./moar $(filelist_moar_bin) -output-dir="$HTML/moar"
-    llvm-cov show -format=html -instr-profile $PROFDATA ./libmoar.* $(filelist_libmoar) -output-dir="$HTML/libmoar"
+    $llvm_cov show -format=html -instr-profile $PROFDATA ./moar $(filelist_moar_bin) -output-dir="$HTML/moar"
+    $llvm_cov show -format=html -instr-profile $PROFDATA ./libmoar.* $(filelist_libmoar) -output-dir="$HTML/libmoar"
     # If env var isn't set then we must be running stage_3 by itself, so set it to 0
     # to not cause an error when we check it numerically
     if [ "$UNCLEAN_TEST" = "" ]; then UNCLEAN_TEST=0; fi
