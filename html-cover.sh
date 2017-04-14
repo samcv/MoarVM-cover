@@ -39,9 +39,9 @@ stage_2 () {
     echo "start stage_2"
     check_prefix
     nqp_folder
-    cd "$NQP_FOLDER" || exit 1
+    cd "$NQP_FOLDER" || echo "Can't cd into NQP folder: $NQP_FOLDER"; exit 1
     if [ ! -f nqp-profile ]; then echo "can't find nqp-profile"; exit 1; fi;
-    if [ -e coverage ]; then mv -v coverage "coverage-$RANDOM" || exit 1; fi
+    if [ -e coverage ]; then mv -v coverage "coverage-$RANDOM" || echo "Can't move coverage to new location"; exit 1; fi
     # RUNNING TESTS HERE
     DATE_VERSION_HEADER="$(printf "%s\n%s" "$(date --utc)" "$(./nqp --version 2> /dev/null)" )"
     printf "Starting tests\n%s\n" "$DATE_VERSION_HEADER"
@@ -53,13 +53,14 @@ stage_2 () {
     if [ ! -f merge-profraw.sh ]; then echo "Can't find merge-profraw.sh"; exit 1; fi
     ./merge-profraw.sh
 
-    cd "$MOAR_FOLDER" || exit
+    cd "$MOAR_FOLDER" || echo "Can't cd into Moar folder: $MOAR_FOLDER"; exit
     echo "end stage_2"
 }
 # Stage 3 generates the html pages
 stage_3 () {
     echo "Entering stage_3"
     check_prefix
+    echo "Creating date version header"
     if [ ! "$DATE_VERSION_HEADER" ]; then DATE_VERSION_HEADER="$(printf "%s\n%s" "$(date --utc)" "$($NQP_FOLDER/nqp --version 2> /dev/null)" )"; fi
     #PROFDATA='../rakudo/coverage/t/nqptestcov.profdata'
     PROFDATA="$NQP_FOLDER/coverage/nqptestcov.profdata"
