@@ -20,6 +20,7 @@ check_prefix () {
 nqp_folder () {
     if [ ! "$NQP_FOLDER" ]; then NQP_FOLDER="../nqp"; fi
 }
+# stage_1 compiles MoarVM and NQP
 stage_1 () {
     check_prefix
     nqp_folder
@@ -30,6 +31,8 @@ stage_1 () {
     make || exit
     cd ../MoarVM || exit 1
 }
+# Stage 2 runs the nqp test suite, collecting test data. It then merges
+# this test data into a single processed file
 stage_2 () {
     check_prefix
     nqp_folder
@@ -49,6 +52,7 @@ stage_2 () {
 
     cd ../MoarVM || exit
 }
+# Stage 3 generates the html pages
 stage_3 () {
     check_prefix
     if [ ! "$DATE_VERSION_HEADER" ]; then DATE_VERSION_HEADER="$(printf "%s\n%s" "$(date --utc)" "$(cd ../nqp; ./nqp --version 2> /dev/null)" )"; fi

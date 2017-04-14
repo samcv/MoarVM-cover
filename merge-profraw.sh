@@ -9,6 +9,13 @@ else
     COVERAGE_DIR="./coverage"
     printf "Merging into folder '%s' via default\n" "$COVERAGE_DIR"
 fi
+find_latest_version () { ls /usr/bin | grep -Ee "^$1(\-[0-9.]+)?$" | sort -r | head -n 1; }
+llvm_profdata=$(find_latest_version llvm-profdata)
+if [ ! "$llvm_profdata" ]; then
+    echo "Didn't find llvm-profdata in /usr/bin hoping it's in your path";
+    llvm_profdata=llvm-profdata;
+fi
+ls /usr/bin | grep -Ee '^clang(\-[0-9.]+)?$' | sort -r | head -n 1
 OUT_FILE="$COVERAGE_DIR/nqptestcov.profdata"
 if [ -d "$COVERAGE_DIR" ]; then
     FILES="$(find $COVERAGE_DIR -name '*.profraw')"
