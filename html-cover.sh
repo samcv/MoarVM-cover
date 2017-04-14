@@ -59,7 +59,7 @@ stage_3 () {
     check_prefix
     if [ ! "$DATE_VERSION_HEADER" ]; then DATE_VERSION_HEADER="$(printf "%s\n%s" "$(date --utc)" "$(cd ../nqp; ./nqp --version 2> /dev/null)" )"; fi
     #PROFDATA='../rakudo/coverage/t/nqptestcov.profdata'
-    PROFDATA='../nqp/coverage/nqptestcov.profdata'
+    PROFDATA="$NQP_FOLDER/coverage/nqptestcov.profdata"
     # Filelist that is used for the coverage
     # main.c is in the `moar` binary. unicode.c is tens of thousands of lines long and
     # because of this is not included right now
