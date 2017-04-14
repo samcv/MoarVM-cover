@@ -31,7 +31,7 @@ stage_1 () {
     cd "$NQP_FOLDER" || exit 1
     ./Configure.pl --prefix="$MOAR_PREFIX" --backends=moar || (NQP_RETURN="$?"; printf "NQP configure returned non-zero exit code(%s) exiting\n" "$NQP_RETURN"; exit "$NQP_RETURN")
     make || exit
-    cd ../MoarVM || exit 1
+    cd "$MOAR_FOLDER" || exit 1
 }
 # Stage 2 runs the nqp test suite, collecting test data. It then merges
 # this test data into a single processed file
@@ -52,7 +52,7 @@ stage_2 () {
     if [ ! -f merge-profraw.sh ]; then echo "Can't find merge-profraw.sh"; exit 1; fi
     ./merge-profraw.sh
 
-    cd ../MoarVM || exit
+    cd "$MOAR_FOLDER" || exit
 }
 # Stage 3 generates the html pages
 stage_3 () {
