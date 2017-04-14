@@ -36,6 +36,7 @@ stage_1 () {
 # Stage 2 runs the nqp test suite, collecting test data. It then merges
 # this test data into a single processed file
 stage_2 () {
+    echo "start stage_2"
     check_prefix
     nqp_folder
     cd "$NQP_FOLDER" || exit 1
@@ -53,11 +54,13 @@ stage_2 () {
     ./merge-profraw.sh
 
     cd "$MOAR_FOLDER" || exit
+    echo "end stage_2"
 }
 # Stage 3 generates the html pages
 stage_3 () {
+    echo "Entering stage_3"
     check_prefix
-    if [ ! "$DATE_VERSION_HEADER" ]; then DATE_VERSION_HEADER="$(printf "%s\n%s" "$(date --utc)" "$(cd ../nqp; ./nqp --version 2> /dev/null)" )"; fi
+    if [ ! "$DATE_VERSION_HEADER" ]; then DATE_VERSION_HEADER="$(printf "%s\n%s" "$(date --utc)" "$($NQP_FOLDER/nqp --version 2> /dev/null)" )"; fi
     #PROFDATA='../rakudo/coverage/t/nqptestcov.profdata'
     PROFDATA="$NQP_FOLDER/coverage/nqptestcov.profdata"
     # Filelist that is used for the coverage
