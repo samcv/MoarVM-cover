@@ -56,3 +56,4 @@ Now you are ready to run the fully automated *super awesome* html-cover.sh scrip
 ```
 This will generate line by line html coverage report as well as stats for each function.
 It will generate into the html directory of MoarVM
+# coverage
